@@ -1,17 +1,15 @@
 # AIPlanetProject
 Dockerizing a simple web application, deploy it to a Kubernetes cluster using Argo CD, and manage its release process with Argo Rollouts
 
-![<img src="images/demo.png"> ](images/demo.png)
+<img src="images/demo.png"> 
 
 ### Software Requirements
 
 - Kubernetes cluster (Minikube, kind, or a cloud provider's Kubernetes service)
 - Docker
-- Kubectl
 - Git version control
 - Argo CD installed on the Kubernetes cluster
-- Argo Rollouts Controller installed on the Kubernetes cluster
-- Argo Rollouts Plugin installed on the kubernetes cluster
+- Argo Rollouts installed on the Kubernetes cluster
 
 ### Knowledge Requirements
 
@@ -26,51 +24,38 @@ Dockerizing a simple web application, deploy it to a Kubernetes cluster using Ar
 
 ### Task 1: Setup and Configuration
 
-**Create Git repo and Install prerequsites**
+**Create a Git Repository:**
 
 1. Create a new repository on GitHub (or another Git hosting platform).
- 
-2. Clone that repo on (VScode,EC2,CMD):
-```
-git clone https://github.com/Uj5Ghare/AIPlanetProject.git
-```
 
-3. Run this shell script to install all the prerequisites(Check: 2GB RAM, 2vCPU, 10GB+ Storage)
-```
-sudo ./prerequisites.sh
-```
+**Install Argo CD:**
 
-##
-
-**Check all prerequisites**
-
-1. Check if Docker is install and running:
+1. Deploy Argo CD using the following command:
 
 ```
-docker --version
-systemctl status docker
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 ```
 
-2. Check if minikube is installed
-```
-minikube version
-minikube start --driver=docker
-```
-
-![alt text](images/minikube-start.png)
-
-
-3. Check if ArgoCD,Rollout & Rollout Plugin is running:
+2. Check if Argo CD is running:
 
 ```
 kubectl get pods -n argocd
-kubectl get pods -n argo-rollouts
-kubectl argo rollouts version
 ```
-![alt text](images/rollout-argocd.png)
 
+**Install Argo Rollouts:**
 
-##
+1. Deploy Argo Rollouts using the following command:
+
+```
+kubectl apply -n argocd -f https://github.com/argoproj/argo-rollouts/releases/latest/download/install.yaml
+```
+
+2. Check if Argo Rollouts is running:
+
+```
+kubectl get pods -n argocd
+```
+
 ### Task 2: Creating the GitOps Pipeline
 
 **Dockerize the Application:**
@@ -78,255 +63,115 @@ kubectl argo rollouts version
 1. Create a Dockerfile to build your web application image, e.g.:
 
 ```
-# Use the official Golang image from the Docker Hub as the base image
-FROM golang:1.16 as build
-
-# Set the working directory inside the container
-WORKDIR /go/src/app
-
-# Copy everything from the current directory to the working directory inside the container
-COPY . .
-
-# Run the 'make' command to build the application
-RUN make
-
-# Start a new stage from scratch
-FROM scratch
-
-# Copy all HTML, PNG, JS, ICO, and CSS files from the current directory to the root directory inside the container
-COPY *.html ./
-COPY *.png ./
-COPY *.js ./
-COPY *.ico ./
-COPY *.css ./
-
-# Copy the 'rollouts-demo' binary from the 'build' stage to the root directory inside the container
-COPY --from=build /go/src/app/rollouts-demo /rollouts-demo
-
-# Declare and set the 'COLOR' environment variable
-ARG COLOR
-ENV COLOR=${COLOR}
-
-# Declare and set the 'ERROR_RATE' environment variable
-ARG ERROR_RATE
-ENV ERROR_RATE=${ERROR_RATE}
-
-# Declare and set the 'LATENCY' environment variable
-ARG LATENCY
-ENV LATENCY=${LATENCY}
-
-# Specify the command to run when the container starts
-ENTRYPOINT [ "/rollouts-demo" ]
+FROM nginx
+COPY index.html /usr/share/nginx/html
 ```
 
-2. To add following secretes follow this path (go to your repo -> settings -> secrets and variables -> Actions -> new repository secrets -> add following scretes one by one)
+2. Build the image using `docker build -t <repo>/<image> .` and push it to a container registry (e.g., Docker Hub).
+
+**Deploy the Application Using Argo CD:**
+
+1. Create a Kubernetes application manifest in your repository, e.g. `deployment.yaml`:
 
 ```
-DOCKER_HUB_USERNAME=<your-dockerhub-username>
-DOCKER_HUB_ACCESS_TOKEN=<your-dockerhub-token>
-COLOR=<blue,red,purple,yellow>
-```
-
-3. Create github workflow to automate the process of Docker image building and pushing into DockerHub in this path(.github/workflows/docker-image.yml)
-```
-name: AIPlanet-Project
-
-on:
-  push:
-    branches: [ main ]
-
-jobs:
-  build:
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Login to DockerHub
-      uses: docker/login-action@v1 
-      with:
-        username: ${{ secrets.DOCKER_HUB_USERNAME }}
-        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-
-    - name: Build the Docker image
-      run: docker build --build-arg COLOR=${{ secrets.COLOR }}  -t ${{ secrets.DOCKER_HUB_USERNAME }}/rollouts-demo:${{ secrets.COLOR }} .
-
-    - name: Push the Docker image
-      run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/rollouts-demo:${{ secrets.COLOR }}
-```
-
-![alt text](images/cicd.png)
-![alt text](images/red.png)
-
-##
-**Deploy the Application Using Argo CD Rollouts:**
-
-1. Create a Kubernetes application manifest in your repository `rollout.yml`:
-
-```
-# The API version for Argo Rollouts
-apiVersion: argoproj.io/v1alpha1
-
-# The kind of the Kubernetes resource
-kind: Rollout
-
-# Metadata about the rollout
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  # The name of the rollout
-  name: ai-ro
-  # The namespace in which the Rollout will be created
-  namespace: ai-ns
-
-# Specification for the rollout
+  name: my-app
 spec:
-  # The number of desired pods for the rollout. This is the number of instances of your application that should be running.
-  replicas: 4
-
-  # Label selector for pods. Existing ReplicaSets whose pods are selected by this will be the ones affected by this rollout.
-  # It's how the Rollout knows which pods to manage.
+  replicas: 1
   selector:
     matchLabels:
-      app: ai-app
-
-  # Template describes the pods that will be created. This is where you define the containers, volumes, etc. that make up your application.
+      app: my-app
   template:
     metadata:
       labels:
-        app: ai-app
+        app: my-app
     spec:
       containers:
-      - name: ai-bluecon
-        # The Docker image for the container
-        image: uj5ghare/rollouts-demo:blue
+      - name: my-app
+        image: <repo>/<image>
         ports:
-        # The port that the container exposes
-        - containerPort: 8080
-
-  # The strategy for the rollout. This is where you define how the rollout should update the pods.
-  strategy:
-    # The canary strategy for the rollout. This strategy gradually rolls out the new version to a small subset of users before rolling it out to the entire infrastructure.
-    canary:
-      # The service that the rollout should use for the canary strategy. This service will route traffic to the new version during the canary phase.
-      canaryService: ai-svc
-
-      # The steps for the canary strategy. Each step represents a phase in the rollout process.
-      steps:
-      # setWeight: This step sets the percentage of user traffic that will be sent to the new version.
-      - setWeight: 25
-      # pause: This step pauses the rollout for a certain duration. This allows you to monitor the new version and ensure it's working as expected before proceeding.
-      - pause: {duration: 30} 
-      - setWeight: 50
-      - pause: {duration: 30}
-      - setWeight: 75
-      - pause: {duration: 30}
-      - setWeight: 100
-      - pause: {duration: 30}
-
+        - containerPort: 80
 ```
 
-2. Create a Kubernetes service manifest to expose application `svc.yml`:
-```
-# The API version for the Service
-apiVersion: v1
-
-# The kind of the Kubernetes resource
-kind: Service
-
-# Metadata about the Service
-metadata:
-  # The name of the Service
-  name: ai-svc
-  # The namespace in which the Service will be created
-  namespace: ai-ns
-
-# Specification for the Service
-spec:
-  # The type of the Service. NodePort means the Service will be accessible on a static port on each Node.
-  type: NodePort
-
-  # Label selector for pods. This is how the Service knows which Pods to direct traffic to.
-  selector:
-    app: ai-app
-
-  # The list of ports that are exposed by this Service.
-  ports:
-    - port: 80
-      # The port on the target Pod to direct traffic to.
-      targetPort: 8080
-      # The port to expose the Service on each Node.
-      nodePort: 30005
+2. Set up Argo CD to watch your repository and deploy the manifest automatically:
 
 ```
-
-3. Set up Argo CD to watch your repository and deploy the manifest automatically:
-
+argo cd create my-app --repo=https://github.com/<user>/<repo> --path=./my-app --dest-namespace=my-app --sync-policy=auto
 ```
-argo cd create ai-app --repo=https://github.com/Uj5Ghare/AIPlanetProject.git --path=./k8s/ --dest-namespace=ai-ns --sync-policy=auto
-```
-![alt text](images/canary25.png)
 
-
-4. We can access ArgoCD UI by using following cmds:
-```
-kubectl port-forward svc/argocd-server 8080:80 --address 0.0.0.0  -n argocd &
-# Go to brower and paste this <your-Ec2-ip>:8080
-
-# To find ArgoCD UI Password (User=admin)
-kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d 
-```
-![alt text](images/1.png)
-![alt text](images/2.png)
-![alt text](images/running-rollout.png)
-![alt text](images/synked.png)
-
-##
 ### Task 3: Implementing a Canary Release with Argo Rollouts
+
+**Define a Rollout Strategy:**
+
+1. Modify the Kubernetes manifest to use Argo Rollouts, specifying a canary release strategy in the rollout definition, e.g.:
+
+```
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: my-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - name: my-app
+        image: <repo>/<image>
+        ports:
+        - containerPort: 80
+  strategy:
+    canary:
+      steps:
+      - setWeight: 25
+        duration: 10m
+      -setWeight: 50
+        duration: 10m
+      -setWeight: 75
+        duration: 10m
+      -setWeight: 100
+        duration: 10m
+```
 
 **Trigger a Rollout:**
 
-1. Update "COLOR" secret to "red"
-2. Do changes in any GitHub file and push it to your GitHub repo. 
+1. Update the Docker image in your repository.
+2. Update the rollout definition to use the new image.
+3. Trigger a rollout using:
+
+```
+argo rollouts rollout my-app
+```
 
 **Monitor the Rollout:**
 
-1. Now you can watch changes live by hitting this cmd in your terminal.
+1. Use Argo Rollouts to track the progress of the canary release:
 
 ```
-kubectl argo rollouts get ro ai-ro -n ai-ns -w
+kubectl rollout status deployment my-app
 ```
 
 2. Ensure the canary release completes successfully.
 
-![alt text](images/canary100.png)
-![alt text](images/events.png)
-![alt text](images/versions.png)
-
-
-##
 ### Task 4: Documentation and Cleanup
 
 **Document the Process:**
 
 1. Create a `readme.md` file in your repository to document the steps you took, including any challenges encountered and how they were resolved.
-Ex: My Challeges and how I resolved
-```
-I. To access app from browser which is running inside the minikube we have to forward svc ports by using below cmds
-
-kubectl port-forward svc/my-svc --address 0.0.0.0 8080:80
-
-IMP: kubectl port-forward is used for creating a local connection to a specific Pod, while kubectl expose is used to expose a service to the outside world
-
-```
 
 **Clean Up:**
 
 1. Remove all resources created during this assignment from the Kubernetes cluster using kubectl commands, e.g.:
 
 ```
-kubectl delete all -l app=ai-app
+kubectl delete deployment my-app
+kubectl delete rollout my-app
 ```
-2. Terminate Ec2 Instance/delete minikube 
-```
-minikube delete
 ```
