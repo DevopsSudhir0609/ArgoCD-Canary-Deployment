@@ -29,9 +29,9 @@ spec:
         app: ai-app
     spec:
       containers:
-      - name: ai-redcon
+      - name: ai-bluecon
         # The Docker image for the container
-        image: uj5ghare/rollouts-demo:red
+        image: uj5ghare/rollouts-demo:blue
         ports:
         # The port that the container exposes
         - containerPort: 8080
