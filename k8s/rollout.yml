@@ -1,32 +1,57 @@
+# The API version for Argo Rollouts
 apiVersion: argoproj.io/v1alpha1
+
+# The kind of the Kubernetes resource
 kind: Rollout
+
+# Metadata about the rollout
 metadata:
+  # The name of the rollout
   name: ai-ro
+
+# Specification for the rollout
 spec:
+  # The number of desired pods for the rollout. This is the number of instances of your application that should be running.
   replicas: 4
+
+  # Label selector for pods. Existing ReplicaSets whose pods are selected by this will be the ones affected by this rollout.
+  # It's how the Rollout knows which pods to manage.
   selector:
     matchLabels:
       app: ai-app
+
+  # Template describes the pods that will be created. This is where you define the containers, volumes, etc. that make up your application.
   template:
     metadata:
       labels:
         app: ai-app
     spec:
       containers:
-      - name: ai-redcon
+      - name: ai-bluecon
+        # The Docker image for the container
         image: uj5ghare/rollouts-demo:blue
         ports:
+        # The port that the container exposes
         - containerPort: 8080
+
+  # The strategy for the rollout. This is where you define how the rollout should update the pods.
   strategy:
+    # The canary strategy for the rollout. This strategy gradually rolls out the new version to a small subset of users before rolling it out to the entire infrastructure.
     canary:
+      # The service that the rollout should use for the canary strategy. This service will route traffic to the new version during the canary phase.
       canaryService: ai-svc
+
+      # The steps for the canary strategy. Each step represents a phase in the rollout process.
       steps:
+      # setWeight: This step sets the percentage of user traffic that will be sent to the new version.
       - setWeight: 25
-      - pause: {duration: 10} 
+      # pause: This step pauses the rollout for a certain duration. This allows you to monitor the new version and ensure it's working as expected before proceeding.
+      - pause: {duration: 30} 
       - setWeight: 50
-      - pause: {duration: 10}
+      - pause: {duration: 30}
       - setWeight: 75
-      - pause: {duration: 10}
+      - pause: {duration: 30}
       - setWeight: 100
-      - pause: {duration: 10}
+      - pause: {duration: 30}
+
 
