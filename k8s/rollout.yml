@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: ai-ro
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: ai-app
+  template:
+    metadata:
+      labels:
+        app: ai-app
+    spec:
+      containers:
+      - name: ai-redcon
+        image: uj5ghare/rollouts-demo:blue
+        ports:
+        - containerPort: 8080
+  strategy:
+    canary:
+      canaryService: ai-svc
+      steps:
+      - setWeight: 25
+      - pause: {duration: 10} 
+      - setWeight: 50
+      - pause: {duration: 10}
+      - setWeight: 75
+      - pause: {duration: 10}
+      - setWeight: 100
+      - pause: {duration: 10}
+
