@@ -1,12 +1,28 @@
+# The API version for the Service
 apiVersion: v1
+
+# The kind of the Kubernetes resource
 kind: Service
+
+# Metadata about the Service
 metadata:
+  # The name of the Service
   name: ai-svc
+
+# Specification for the Service
 spec:
+  # The type of the Service. NodePort means the Service will be accessible on a static port on each Node.
   type: NodePort
+
+  # Label selector for pods. This is how the Service knows which Pods to direct traffic to.
   selector:
     app: ai-app
+
+  # The list of ports that are exposed by this Service.
   ports:
     - port: 80
+      # The port on the target Pod to direct traffic to.
       targetPort: 8080
+      # The port to expose the Service on each Node.
       nodePort: 30005
+
