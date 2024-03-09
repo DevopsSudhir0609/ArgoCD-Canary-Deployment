@@ -1,7 +1,7 @@
 # AIPlanetProject
 Dockerizing a simple web application, deploy it to a Kubernetes cluster using Argo CD, and manage its release process with Argo Rollouts
 
-<img src="images/">
+<img src="images/demo.png"> 
 
 ### Software Requirements
 
