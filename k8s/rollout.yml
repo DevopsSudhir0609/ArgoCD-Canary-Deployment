@@ -8,6 +8,8 @@ kind: Rollout
 metadata:
   # The name of the rollout
   name: ai-ro
+  # The namespace in which the Rollout will be created
+  namespace: ai-ns
 
 # Specification for the rollout
 spec:

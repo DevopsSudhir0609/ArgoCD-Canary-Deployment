@@ -8,6 +8,8 @@ kind: Service
 metadata:
   # The name of the Service
   name: ai-svc
+  # The namespace in which the Service will be created
+  namespace: ai-ns
 
 # Specification for the Service
 spec:
