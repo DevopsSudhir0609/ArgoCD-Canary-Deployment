@@ -19,7 +19,7 @@ jobs:
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
     - name: Build the Docker image
-      run: docker build --build-arg COLOR=blue  -t ${{ secrets.DOCKER_HUB_USERNAME }}/rollouts-demo:${{ secrets.COLOR }} .
+      run: docker build --build-arg COLOR=${{ secrets.COLOR }}  -t ${{ secrets.DOCKER_HUB_USERNAME }}/rollouts-demo:${{ secrets.COLOR }} .
 
     - name: Push the Docker image
       run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/rollouts-demo:${{ secrets.COLOR }}
