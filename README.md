@@ -1,9 +1,14 @@
-# AIPlanetProject
-Dockerizing a simple web application, deploy it to a Kubernetes cluster using Argo CD, and manage its release process with Argo Rollouts
+# 🤖 AIPlanetProject
+*Note:* This repo is cloned from `argoproj/rollouts-demo` and modified by `Uj5ghare/AIPlanetProject`
+<br>
+*Task:* Dockerizing a simple web application, deploy it to a Kubernetes cluster using Argo CD, and manage its release process with Argo Rollouts.
+
+
+<br>
 
 ![<img src="images/demo.png"> ](images/demo.png)
 
-### Software Requirements
+### 🈸 Software Requirements
 
 - Kubernetes cluster (Minikube, kind, or a cloud provider's Kubernetes service)
 - Docker
@@ -13,7 +18,7 @@ Dockerizing a simple web application, deploy it to a Kubernetes cluster using Ar
 - Argo Rollouts Controller installed on the Kubernetes cluster
 - Argo Rollouts Plugin installed on the kubernetes cluster
 
-### Knowledge Requirements
+### 📔 Knowledge Requirements
 
 - Basic understanding of Kubernetes concepts (Pods, Deployments, Services)
 - Familiarity with Docker and containerization
@@ -22,7 +27,7 @@ Dockerizing a simple web application, deploy it to a Kubernetes cluster using Ar
 - Familiarity with Argo CD and Argo Rollouts documentation
 
 ##
-## Step-by-Step Guide to GitOps with Argo CD and Argo Rollouts
+## 🚀 Step-by-Step Guide to GitOps with Argo CD and Argo Rollouts
 
 ### Task 1: Setup and Configuration
 
@@ -330,3 +335,7 @@ kubectl delete all -l app=ai-app
 ```
 minikube delete
 ```
+
+
+##
+##
