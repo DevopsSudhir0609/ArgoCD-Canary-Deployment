@@ -33,7 +33,7 @@ jobs:
 
       - name: Update Kubernetes manifests # This step updates the Docker image tag in your Kubernetes manifest file (rollout.yml) with the value of the COLOR secret.
         run: |
-          sed -i "s|uj5ghare/rollouts-demo:.*|uj5ghare/rollouts-demo:${{ secrets.COLOR }}|" rollout.yml
+          sed -i "s|uj5ghare/rollouts-demo:.*|uj5ghare/rollouts-demo:${{ secrets.COLOR }}|" k8s/rollout.yml
 
       - name: Commit and push changes # This step configures your git user name and email, commits the changes made in the previous step with a message, and then pushes the commit to your repository.
         run: |
