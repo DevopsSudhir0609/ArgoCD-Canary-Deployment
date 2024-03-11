@@ -12,6 +12,7 @@ curl -fsSL https://get.docker.com -o get-docker.sh || handle_error "Failed to do
 sudo sh get-docker.sh || handle_error "Failed to install Docker"
 sudo rm -rf get-docker.sh
 sudo usermod -aG docker $USER
+sudo service docker start
 
 # 2. Install Minikube
 echo "Installing Minikube..."
@@ -41,8 +42,13 @@ kubectl apply -n argo-rollouts -f https://github.com/argoproj/argo-rollouts/rele
 # 6. Install ArgoCD Rollouts Plugin
 echo "Installing ArgoCD Rollouts Plugin..."
 curl -LO https://github.com/argoproj/argo-rollouts/releases/latest/download/kubectl-argo-rollouts-linux-amd64 || handle_error "Failed to download ArgoCD Rollouts Plugin"
-chmod +x ./kubectl-argo-rollouts-linux-amd64 || handle_error "Failed to set execute permission on ArgoCD Rollouts Plugin"
+sudo chmod +x ./kubectl-argo-rollouts-linux-amd64 || handle_error "Failed to set execute permission on ArgoCD Rollouts Plugin"
 sudo mv ./kubectl-argo-rollouts-linux-amd64 /usr/local/bin/kubectl-argo-rollouts || handle_error "Failed to install ArgoCD Rollouts Plugin"
 kubectl argo rollouts version || handle_error "Failed to verify ArgoCD Rollouts Plugin version"
+
+# 7. Install ArgoCD CLI (Optional)
+# curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64 || handle_error "Failed to download argocd cli"
+# sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd || handle_error "Failed to give premissions to argocd-linux-amd64"
+# rm argocd-linux-amd64 || handle_error "Failed to remove argocd-linux-amd64"
 
 echo "All installations completed successfully!"

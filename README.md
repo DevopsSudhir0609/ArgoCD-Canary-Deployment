@@ -264,7 +264,19 @@ spec:
 
 ```
 
-3. Set up Argo CD to watch your repository and deploy the manifest automatically:
+3. Set up Argo CD to watch your repository and deploy the manifest automatically. (ArgoCD CLI must be installed)
+
+Install ArgoCD CLI 
+```
+# Download the latest Argo CD binary
+curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+
+# Install the downloaded binary to /usr/local/bin with necessary permissions
+sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
+
+# Remove the downloaded binary file
+rm argocd-linux-amd64
+```
 
 ```
 argo cd create ai-app --repo=https://github.com/Uj5Ghare/AIPlanetProject.git --path=./k8s/ --dest-namespace=ai-ns --sync-policy=auto
