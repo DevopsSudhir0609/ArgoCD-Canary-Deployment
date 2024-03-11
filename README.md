@@ -134,31 +134,49 @@ COLOR=<blue,red,purple,yellow>
 
 3. Create github workflow to automate the process of Docker image building and pushing into DockerHub in this path(.github/workflows/docker-image.yml)
 ```
-name: AIPlanet-Project
+name: AIPlanet-Project # This is the name of your workflow
 
 on:
   push:
-    branches: [ main ]
+    branches: [main] # This workflow gets triggered when there's a push event on the 'main' branch
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
+  push-image:
+    runs-on: ubuntu-latest # The type of runner that the job will run on
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2 # This step checks-out your repository under $GITHUB_WORKSPACE
 
-    - name: Login to DockerHub
-      uses: docker/login-action@v1 
-      with:
-        username: ${{ secrets.DOCKER_HUB_USERNAME }}
-        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Login to DockerHub
+        uses: docker/login-action@v1 # This step logs in to DockerHub
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }} # DockerHub username stored as a GitHub secret
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }} # DockerHub access token stored as a GitHub secret
 
-    - name: Build the Docker image
-      run: docker build --build-arg COLOR=${{ secrets.COLOR }}  -t ${{ secrets.DOCKER_HUB_USERNAME }}/rollouts-demo:${{ secrets.COLOR }} .
+      - name: Build the Docker image
+        run: docker build --build-arg COLOR=${{ secrets.COLOR }}  -t ${{ secrets.DOCKER_HUB_USERNAME }}/rollouts-demo:${{ secrets.COLOR }} . # This step builds the Docker image using the 'COLOR' build argument
 
-    - name: Push the Docker image
-      run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/rollouts-demo:${{ secrets.COLOR }}
+      - name: Push the Docker image
+        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/rollouts-demo:${{ secrets.COLOR }} # This step pushes the Docker image to DockerHub
+
+  update-manifest:
+    needs: push-image # This job depends on the 'push-image' job. It will not start until 'push-image' has completed successfully.
+    runs-on: ubuntu-latest # This job runs on an Ubuntu-latest runner.
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2 # This step checks out a copy of your repository.
+
+      - name: Update Kubernetes manifests # This step updates the Docker image tag in your Kubernetes manifest file (rollout.yml) with the value of the COLOR secret.
+        run: |
+          sed -i "s|uj5ghare/rollouts-demo:.*|uj5ghare/rollouts-demo:${{ secrets.COLOR }}|" rollout.yml
+
+      - name: Commit and push changes # This step configures your git user name and email, commits the changes made in the previous step with a message, and then pushes the commit to your repository.
+        run: |
+          git config --global user.name 'Uj5Ghare'
+          git config --global user.email 'ujwal5ghare@gmail.com'
+          git commit -am "Update Docker image tag to ${{ secrets.COLOR }}"
+          git push
 ```
 
 ![alt text](images/cicd.png)
