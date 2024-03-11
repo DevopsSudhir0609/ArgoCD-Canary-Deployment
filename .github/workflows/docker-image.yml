@@ -37,7 +37,7 @@ jobs:
 
       - name: Commit and push changes # This step configures your git user name and email, commits the changes made in the previous step with a message, and then pushes the commit to your repository.
         run: |
-          git config --global user.name 'Uj5Ghare'
-          git config --global user.email 'ujwal5ghare@gmail.com'
+          git config --global user.name "Uj5Ghare"
+          git config --global user.email "ujwal5ghare@gmail.com"
           git commit -am "Update Docker image tag to ${{ secrets.COLOR }}"
           git push
