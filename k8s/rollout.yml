@@ -31,7 +31,7 @@ spec:
       containers:
       - name: ai-bluecon
         # The Docker image for the container
-        image: uj5ghare/rollouts-demo:blue
+        image: uj5ghare/rollouts-demo:red
         ports:
         # The port that the container exposes
         - containerPort: 8080
