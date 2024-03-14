@@ -3,6 +3,7 @@
 <br>
 *Task:* Dockerizing a simple web application, deploy it to a Kubernetes cluster using Argo CD, and manage its release process with Argo Rollouts.
 
+
 <br>
 
 ![<img src="images/demo.png"> ](images/demo.png)
