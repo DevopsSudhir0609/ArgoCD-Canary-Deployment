@@ -2,6 +2,7 @@
 *Note:* This repo is cloned from `argoproj/rollouts-demo` and modified by `Uj5ghare/AIPlanetProject`
 <br>
 *Task:* Dockerizing a simple web application, deploy it to a Kubernetes cluster using Argo CD, and manage its release process with Argo Rollouts.
+*Explanation Video:* https://drive.google.com/file/d/1SA6qr2qri1lv0olQNljqHeG2zh7Q7t2q/view?usp=sharing
 
 
 
