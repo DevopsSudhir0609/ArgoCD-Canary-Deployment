@@ -1,5 +1,5 @@
-# 🤖 AIPlanetProject
-*Note:* This repo is cloned from `argoproj/rollouts-demo` and modified by `Uj5ghare/AIPlanetProject`
+# 🤖 ArgoCD-Canary-Deployment
+*Note:* This repo is cloned from `argoproj/rollouts-demo` and modified by `Uj5ghare/ArgoCD-Canary-Deployment`
 <br>
 *Task:* Dockerizing a simple web application, deploy it to a Kubernetes cluster using Argo CD, and manage its release process with Argo Rollouts.
 <br>
@@ -40,7 +40,7 @@
  
 2. Clone that repo on (VScode,EC2,CMD):
 ```
-git clone https://github.com/Uj5Ghare/AIPlanetProject.git
+git clone https://github.com/Uj5Ghare/ArgoCD-Canary-Deployment.git
 ```
 
 3. Run this shell script to install all the prerequisites(Check: 2GB RAM, 2vCPU, 10GB+ Storage)
@@ -300,7 +300,7 @@ rm argocd-linux-amd64
 ```
 
 ```
-argo cd create ai-app --repo=https://github.com/Uj5Ghare/AIPlanetProject.git --path=./k8s/ --dest-namespace=ai-ns --sync-policy=auto
+argo cd create ai-app --repo=https://github.com/Uj5Ghare/ArgoCD-Canary-Deployment.git --path=./k8s/ --dest-namespace=ai-ns --sync-policy=auto
 ```
 ![alt text](images/canary25.png)
 

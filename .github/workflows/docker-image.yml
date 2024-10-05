@@ -2,8 +2,10 @@ name: AIPlanet-Project # This is the name of your workflow
 
 on:
   push:
-    branches: [main] # This workflow gets triggered when there's a push event on the 'main' branch
-
+    paths:
+      - .github/workflows/docker-image.yml
+      - ./k8s/*
+      
 jobs:
   push-image:
     runs-on: ubuntu-latest # The type of runner that the job will run on
