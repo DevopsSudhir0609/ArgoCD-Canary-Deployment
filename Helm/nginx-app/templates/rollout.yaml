@@ -14,25 +14,19 @@ spec:
         app: ai-app
     spec:
       containers:
-        - name: ai-bluecon
-          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
-          ports:
-            - containerPort: 8080
-          readinessProbe:
-            httpGet:
-              path: /healthz
-              port: 8080
-            initialDelaySeconds: 5
-            periodSeconds: 5
+      - name: ai-bluecon
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        ports:
+        - containerPort: 8080
   strategy:
     canary:
-      canaryService: ai-svc-canary
-      stableService: ai-svc-stable
+      canaryService: ai-svc
       steps:
-        - setWeight: 25
-        - pause: { duration: 30 }
-        - setWeight: 50
-        - pause: { duration: 30 }
-        - setWeight: 75
-        - pause: { duration: 30 }
-        - setWeight: 100
+      - setWeight: 25
+      - pause: {duration: 30}
+      - setWeight: 50
+      - pause: {duration: 30}
+      - setWeight: 75
+      - pause: {duration: 30}
+      - setWeight: 100
+      - pause: {duration: 30}
