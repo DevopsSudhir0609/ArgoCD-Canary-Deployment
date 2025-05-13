@@ -1,0 +1,6 @@
+apiVersion: v2
+name: nginx-canary
+description: A Helm chart for Argo Rollouts Canary Deployment
+type: application
+version: 0.1.0
+appVersion: "1.0"
