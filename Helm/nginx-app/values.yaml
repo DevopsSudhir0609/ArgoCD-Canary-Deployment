@@ -2,4 +2,4 @@ replicaCount: 4
 
 image:
   repository: uj5ghare/rollouts-demo
-  tag: blue
+  tag: green
