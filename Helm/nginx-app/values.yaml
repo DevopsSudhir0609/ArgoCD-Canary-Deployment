@@ -1,5 +1,5 @@
 replicaCount: 4
 
 image:
-  repository: uj5ghare/rollouts-demo
-  tag: green
+  repository: argoproj/rollouts-demo  # Official Argo Rollouts demo image
+  tag: green  # Options: blue, green, yellow
