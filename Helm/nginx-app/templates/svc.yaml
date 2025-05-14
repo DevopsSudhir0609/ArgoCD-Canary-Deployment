@@ -1,8 +1,27 @@
+# Canary Service
 apiVersion: v1
 kind: Service
 metadata:
-  name: ai-svc
+  name: ai-svc-canary
   namespace: ai-ns
+  labels:
+    app.kubernetes.io/managed-by: Helm
+spec:
+  selector:
+    app: ai-app
+  ports:
+    - port: 80
+      targetPort: 8080
+  type: LoadBalancer
+---
+# Stable Service 
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-svc-stable
+  namespace: ai-ns
+  labels:
+    app.kubernetes.io/managed-by: Helm
 spec:
   selector:
     app: ai-app
